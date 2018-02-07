@@ -37,18 +37,6 @@ class User(Model):
             u.save()
             return u
 
+    def buy_cards(self):
+        pass
 
-User.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
-
-
-# u = User(3, 'ye', last_login=datetime.datetime.now())
-# u.achievements = {1, 2, 3}
-# u.list = [1, 2, 3, 2]
-# u.puzzle = {'a': 1, 'B': 2}
-# u.save()
-
-
-# u = User.get(3, 'ye')
-# print u
-# print u.puzzle
-# print u.last_login

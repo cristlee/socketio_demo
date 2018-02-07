@@ -13,7 +13,10 @@
     </form>
 
     <input id="logout" type="submit" value="Logout"/>
+    <input id="bc1" type="submit" value="Buy 1 card"/>
+    <input id="bc2" type="submit" value="Buy 2 card"/>
     <div id="cities-list"></div>
+    <div id="room-list"></div>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
@@ -25,7 +28,15 @@
             var socket = io.connect("http://52.53.44.20:8026");
 
             socket.on('auth', function(msg) {
-                socket.emit('auth', {'username': 'feng', 'passwd':'123456'});
+                socket.emit('auth', {'uid': 1, 'device':'duid_3e375fe3ab9f609828930044a1dcb37a66443957'});
+            });
+
+            socket.on('unauth', function(msg) {
+                console.log('un auth');
+            });
+
+            socket.on('login', function(msg) {
+                console.log('uid: '+ msg.uid);
             });
 
             socket.on('msg', function(msg) {
@@ -41,6 +52,15 @@
                 $("#cities-list").html(s);
             });
 
+            socket.on('room', function(msg) {
+                console.log(msg);
+                var s = '';
+                for (var key in msg) {
+                    s += '<p>' + key + '</p>';
+                }
+                $("#room-list").html(s);
+            });
+
             $("#cityform").submit(function(event) {
                 socket.emit('city', {'city': $('#city').val()});
                 $('#city').val('');
@@ -51,6 +71,13 @@
                 socket.emit('logout', {});
             });
 
+            $("#bc1").click(function() {
+                socket.emit('buycard', {'cards': 1});
+            });
+
+            $("#bc2").click(function() {
+                socket.emit('buycard', {'cards': 2});
+            });
         });
 
     </script>

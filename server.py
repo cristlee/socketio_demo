@@ -1,6 +1,8 @@
-from flask import Flask, session, request
+from flask import Flask, session
 from flask_socketio import SocketIO, emit
 import functools
+from model import User
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -8,12 +10,13 @@ socketio = SocketIO(app)
 
 citys = {}
 users = 0
+messages = []
 
 
 def login_required(f):
     @functools.wraps(f)
     def wrapped(*args, **kwargs):
-        if not session.get('uid'):
+        if not session.get('u'):
             emit('auth', {})
         else:
             return f(*args, **kwargs)
@@ -24,8 +27,6 @@ def login_required(f):
 def ws_conn():
     global users
     users += 1
-    print request.sid
-    session['uid'] = request.sid
     socketio.emit('msg', {'count': users})
     emit('auth', {})
 
@@ -33,25 +34,30 @@ def ws_conn():
 @socketio.on('disconnect')
 def ws_disconn():
     global users
-    session['uid'] = None
+    session['u'] = None
     users -= 1
     socketio.emit('msg', {'count': users})
 
 
 @socketio.on('auth')
 def auth(message):
-    username = message['username']
-    password = message['passwd']
-    print username, password
-    print session['uid']
-    session['uid'] = username
-    session['dict'] = {'a': 1, 'b': {'c': 2}}
+    uid = message['uid']
+    device = message['device']
+    try:
+        u = User.get(device)
+        if u.id == uid:
+            session['u'] = u
+            emit('login', {'uid': uid})
+        else:
+            emit('unauth', {})
+    except User.DoesNotExist:
+        emit('unauth', {})
+    print type(uid), device
 
 
 @socketio.on('logout')
 def logout(message):
-    print message
-    session['uid'] = None
+    session['u'] = None
 
 
 @socketio.on('city')
@@ -65,6 +71,19 @@ def ws_city(message):
     else:
         citys[city] = 1
     socketio.emit('cities', citys)
+
+
+@socketio.on('buycard')
+@login_required
+def buy_card(message):
+    cards = message['cards']
+    print type(cards)
+    u = session.get('u')
+    u.refresh()
+    u.tickets -= cards * 10
+    u.save()
+    message.append(u.name + ' buy ' + cards + ' cards')
+    socketio.emit('room', message)
 
 
 if __name__ == '__main__':
