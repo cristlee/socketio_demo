@@ -10,7 +10,7 @@ socketio = SocketIO(app)
 
 citys = {}
 users = 0
-messages = []
+room = []
 
 
 def login_required(f):
@@ -80,8 +80,8 @@ def buy_card(message):
     u.refresh()
     u.tickets -= cards * 10
     u.save()
-    message.append(u.name + ' buy ' + cards + ' cards')
-    socketio.emit('room', message)
+    room.append(u.name + ' buy ' + cards + ' cards')
+    socketio.emit('room', room)
 
 
 if __name__ == '__main__':
