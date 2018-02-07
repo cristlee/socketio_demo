@@ -64,8 +64,6 @@ def logout(message):
 @login_required
 def ws_city(message):
     city = message['city']
-    print session['uid']
-    print session['dict']
     if citys.get(city):
         citys[city] += 1
     else:
