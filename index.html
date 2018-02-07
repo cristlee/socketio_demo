@@ -36,7 +36,7 @@
                 window.localStorage.uid = msg.uid;
                 return msg.uid;
             }
-            return window.localStorage.uid;
+            return parseInt(window.localStorage.uid);
         }
 
         $(document).ready(function() {

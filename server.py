@@ -48,6 +48,7 @@ def create_user(message):
 
 @socketio.on('auth')
 def auth(message):
+    print message
     uid = message['uid']
     device = message['device']
     try:
