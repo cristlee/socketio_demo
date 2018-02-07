@@ -26,6 +26,7 @@ def login_required(f):
 def ws_conn():
     global users
     users += 1
+    print users
     socketio.emit('user_count', {'count': users})
     emit('auth', {})
 

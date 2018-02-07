@@ -44,6 +44,7 @@
             var socket = io.connect("http://52.53.44.20:8026");
 
             var uuid = get_guid();
+            console.log(uuid);
 
             socket.emit('create_user', {'device': uuid});
 
@@ -60,7 +61,7 @@
                 console.log('uid: '+ msg.uid);
             });
 
-            socket.on('msg', function(msg) {
+            socket.on('user_count', function(msg) {
                 $("#connected").html(msg.count);
             });
 
