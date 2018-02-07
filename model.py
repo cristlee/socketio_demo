@@ -34,6 +34,7 @@ class User(Model):
         u.id = user_count.id + 1
         user_count.update(actions=[User.id.set(User.id + 1)])
         u.save()
+        return u
 
 
 User.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
