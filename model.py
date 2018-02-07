@@ -11,9 +11,9 @@ class User(Model):
         table_name = 'User'
         region = 'us-west-2'
 
-    id = NumberAttribute(hash_key=True)
-    device = UnicodeAttribute(range_key=True)
-    name = UnicodeAttribute()
+    device = UnicodeAttribute(hash_key=True)
+    id = NumberAttribute()
+    name = UnicodeAttribute(null=True)
     lev = NumberAttribute(default=1)
     xp = NumberAttribute(default=0)
     tickets = NumberAttribute(default=2000)
@@ -24,8 +24,20 @@ class User(Model):
     first_login = UTCDateTimeAttribute(null=True)
     last_login = UTCDateTimeAttribute(null=True)
 
+    @classmethod
+    def create_by_device(cls, device):
+        user_count = cls.get('user_count')
+        u = User.get(device)
+        if u:
+            return
+        u = User(device)
+        u.id = user_count.id + 1
+        user_count.update(actions=[User.id.set(User.id + 1)])
+        u.save()
+
 
 User.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+
 
 # u = User(3, 'ye', last_login=datetime.datetime.now())
 # u.achievements = {1, 2, 3}
