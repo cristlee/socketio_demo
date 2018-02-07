@@ -28,7 +28,8 @@ class User(Model):
     def create_by_device(cls, device):
         user_count = cls.get('user_count')
         try:
-            cls.get(device)
+            u = cls.get(device)
+            return u
         except cls.DoesNotExist:
             u = User(device)
             u.id = user_count.id + 1
@@ -37,6 +38,7 @@ class User(Model):
             u.save()
             return u
 
-    def buy_cards(self):
-        pass
+    def buy_cards(self, cards):
+        self.tickets -= cards * 10
+        self.save()
 

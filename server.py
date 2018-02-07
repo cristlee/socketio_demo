@@ -8,9 +8,8 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 
-citys = {}
 users = 0
-room = []
+room_info = []
 
 
 def login_required(f):
@@ -27,7 +26,7 @@ def login_required(f):
 def ws_conn():
     global users
     users += 1
-    socketio.emit('msg', {'count': users})
+    socketio.emit('user_count', {'count': users})
     emit('auth', {})
 
 
@@ -36,7 +35,15 @@ def ws_disconn():
     global users
     session['u'] = None
     users -= 1
-    socketio.emit('msg', {'count': users})
+    socketio.emit('user_count', {'count': users})
+
+
+@socketio.on('create_user')
+def create_user(message):
+    device = message['device']
+    print device
+    u = User.create_by_device(device)
+    emit('auth', {'uid': u.id})
 
 
 @socketio.on('auth')
@@ -56,18 +63,8 @@ def auth(message):
 
 @socketio.on('logout')
 def logout(message):
+    print message
     session['u'] = None
-
-
-@socketio.on('city')
-@login_required
-def ws_city(message):
-    city = message['city']
-    if citys.get(city):
-        citys[city] += 1
-    else:
-        citys[city] = 1
-    socketio.emit('cities', citys)
 
 
 @socketio.on('buycard')
@@ -75,11 +72,9 @@ def ws_city(message):
 def buy_card(message):
     cards = message['cards']
     u = session.get('u')
-    u.refresh()
-    u.tickets -= cards * 10
-    u.save()
-    room.append(u.name + ' buy ' + str(cards) + ' cards')
-    socketio.emit('room', room)
+    u.buy_cards(cards)
+    room_info.append(u.name + ' buy ' + str(cards) + ' cards')
+    socketio.emit('room', room_info)
 
 
 if __name__ == '__main__':

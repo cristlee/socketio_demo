@@ -4,31 +4,52 @@
 
     <h2><span id="connected">0</span> users are on this page right now.</h2>
 
-    <h3>what is your favorite city?</h3>
-
-    <form method="post" action="#" id="cityform">
-        <label>City</label>
-        <input type="text" id="city"/>
-        <input type="submit" value="Submit"/>
-    </form>
-
     <input id="logout" type="submit" value="Logout"/>
     <input id="bc1" type="submit" value="Buy 1 card"/>
     <input id="bc2" type="submit" value="Buy 2 card"/>
-    <div id="cities-list"></div>
-    <div id="room-list"></div>
+
+    <div id="room_list"></div>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
 
     <script type="text/javascript">
 
+        function generate_guid() {
+            function s4() {
+                return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+        }
+
+        function get_guid() {
+            if (window.localStorage.guid != null) {
+                return window.localStorage.guid;
+            } else {
+                window.localStorage.guid = generate_guid();
+                return window.localStorage.guid;
+            }
+        }
+
+        function get_uid(msg) {
+            if ('uid' in msg) {
+                window.localStorage.uid = msg.uid;
+                return msg.uid;
+            }
+            return window.localStorage.uid;
+        }
+
         $(document).ready(function() {
 
             var socket = io.connect("http://52.53.44.20:8026");
 
+            var uuid = get_guid();
+
+            socket.emit('create_user', {'device': uuid});
+
             socket.on('auth', function(msg) {
-                socket.emit('auth', {'uid': 1, 'device':'duid_3e375fe3ab9f609828930044a1dcb37a66443957'});
+                var uid = get_uid(msg);
+                socket.emit('auth', {'uid': uid, 'device': uuid});
             });
 
             socket.on('unauth', function(msg) {
@@ -43,28 +64,13 @@
                 $("#connected").html(msg.count);
             });
 
-            socket.on('cities', function(msg) {
-                console.log(msg);
-                var s = '';
-                for (var key in msg) {
-                    s += '<p>' + key + ': ' + msg[key] + '</p>';
-                }
-                $("#cities-list").html(s);
-            });
-
             socket.on('room', function(msg) {
                 console.log(msg);
                 var s = '';
                 for (var key in msg) {
-                    s += '<p>' + key + '</p>';
+                    s += '<p>' + msg[key] + '</p>';
                 }
-                $("#room-list").html(s);
-            });
-
-            $("#cityform").submit(function(event) {
-                socket.emit('city', {'city': $('#city').val()});
-                $('#city').val('');
-                return false;
+                $("#room_list").html(s);
             });
 
             $("#logout").click(function() {
