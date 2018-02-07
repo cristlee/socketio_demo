@@ -52,7 +52,6 @@ def auth(message):
             emit('unauth', {})
     except User.DoesNotExist:
         emit('unauth', {})
-    print type(uid), device
 
 
 @socketio.on('logout')
@@ -75,12 +74,11 @@ def ws_city(message):
 @login_required
 def buy_card(message):
     cards = message['cards']
-    print type(cards)
     u = session.get('u')
     u.refresh()
     u.tickets -= cards * 10
     u.save()
-    room.append(u.name + ' buy ' + cards + ' cards')
+    room.append(u.name + ' buy ' + str(cards) + ' cards')
     socketio.emit('room', room)
 
 
