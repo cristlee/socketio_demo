@@ -1,0 +1,58 @@
+<html>
+<head><title>bingo party</title></head>
+<body>
+
+    <h2><span id="connected">0</span> users are on this page right now.</h2>
+
+    <h3>what is your favorite city?</h3>
+
+    <form method="post" action="#" id="cityform">
+        <label>City</label>
+        <input type="text" id="city"/>
+        <input type="submit" value="Submit"/>
+    </form>
+
+    <input id="logout" type="submit" value="Logout"/>
+    <div id="cities-list"></div>
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            var socket = io.connect("http://127.0.0.1:5000");
+
+            socket.on('auth', function(msg) {
+                socket.emit('auth', {'username': 'feng', 'passwd':'123456'});
+            });
+
+            socket.on('msg', function(msg) {
+                $("#connected").html(msg.count);
+            });
+
+            socket.on('cities', function(msg) {
+                console.log(msg);
+                var s = '';
+                for (var key in msg) {
+                    s += '<p>' + key + ': ' + msg[key] + '</p>';
+                }
+                $("#cities-list").html(s);
+            });
+
+            $("#cityform").submit(function(event) {
+                socket.emit('city', {'city': $('#city').val()});
+                $('#city').val('');
+                return false;
+            });
+
+            $("#logout").click(function() {
+                socket.emit('logout', {});
+            });
+
+        });
+
+    </script>
+</body>
+</html>
