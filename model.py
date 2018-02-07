@@ -27,14 +27,15 @@ class User(Model):
     @classmethod
     def create_by_device(cls, device):
         user_count = cls.get('user_count')
-        u = User.get(device)
-        if u:
-            return
-        u = User(device)
-        u.id = user_count.id + 1
-        user_count.update(actions=[User.id.set(User.id + 1)])
-        u.save()
-        return u
+        try:
+            cls.get(device)
+        except cls.DoesNotExist:
+            u = User(device)
+            u.id = user_count.id + 1
+            u.name = 'guest_' + str(u.id)
+            user_count.update(actions=[User.id.set(User.id + 1)])
+            u.save()
+            return u
 
 
 User.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
