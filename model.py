@@ -41,4 +41,3 @@ class User(Model):
     def buy_cards(self, cards):
         self.tickets -= cards * 10
         self.save()
-
