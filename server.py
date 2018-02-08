@@ -7,7 +7,6 @@ from model import User
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-
 users = 0
 buy_card_info = []
 room_info = []
@@ -77,7 +76,7 @@ def buy_card(message):
     u = session.get('u')
     u.buy_cards(cards)
     buy_card_info.append(u.name + ' buy ' + str(cards) + ' cards')
-    socketio.emit('buycard', buy_card_info)
+    emit('buycard', buy_card_info)
 
 
 @socketio.on('join')
@@ -87,7 +86,7 @@ def on_join(data):
     room = data['room']
     join_room(room)
     print rooms()
-    room_info.append(u.name + ' has entered the room.')
+    room_info.append(u.name + ' has entered room ' + room)
     emit('room', room_info, room=room)
 
 
@@ -98,7 +97,7 @@ def on_leave(data):
     room = data['room']
     print rooms()
     leave_room(room)
-    room_info.append(u.name + ' has left the room.')
+    room_info.append(u.name + ' has left room ' + room)
     emit('room', room_info, room=room)
 
 
