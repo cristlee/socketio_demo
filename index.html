@@ -7,8 +7,15 @@
     <input id="logout" type="submit" value="Logout"/>
     <input id="bc1" type="submit" value="Buy 1 card"/>
     <input id="bc2" type="submit" value="Buy 2 card"/>
+    <input id="jr1" type="submit" value="join room 1"/>
+    <input id="jr2" type="submit" value="join room 2"/>
+    <input id="lr1" type="submit" value="leave room 1"/>
+    <input id="lr2" type="submit" value="leave room 2"/>
 
-    <div id="room_list"></div>
+    <p>buy card info</p>
+    <div id="buy_card_info"></div>
+    <p>room info</p>
+    <div id="room_info"></div>
 
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
@@ -65,13 +72,22 @@
                 $("#connected").html(msg.count);
             });
 
+            socket.on('buycard', function(msg) {
+                console.log(msg);
+                var s = '';
+                for (var key in msg) {
+                    s += '<p>' + msg[key] + '</p>';
+                }
+                $("#buy_card_info").html(s);
+            });
+
             socket.on('room', function(msg) {
                 console.log(msg);
                 var s = '';
                 for (var key in msg) {
                     s += '<p>' + msg[key] + '</p>';
                 }
-                $("#room_list").html(s);
+                $("#room_info").html(s);
             });
 
             $("#logout").click(function() {
@@ -84,6 +100,22 @@
 
             $("#bc2").click(function() {
                 socket.emit('buycard', {'cards': 2});
+            });
+
+            $("#jr1").click(function() {
+                socket.emit('join', {'room': 1});
+            });
+
+            $("#jr2").click(function() {
+                socket.emit('join', {'room': 2});
+            });
+
+            $("#lr1").click(function() {
+                socket.emit('leave', {'room': 1});
+            });
+
+            $("#lr2").click(function() {
+                socket.emit('leave', {'room': 2});
             });
         });
 
