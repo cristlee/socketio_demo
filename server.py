@@ -83,8 +83,9 @@ def buy_card(message):
 @login_required
 def on_join(data):
     u = session.get('u')
-    room = data['room']
+    room = str(data['room'])
     join_room(room)
+    print 'rooms: '
     print rooms()
     room_info.append(u.name + ' has entered room ' + room)
     emit('room', room_info, room=room)
@@ -94,7 +95,8 @@ def on_join(data):
 @login_required
 def on_leave(data):
     u = session.get('u')
-    room = data['room']
+    room = str(data['room'])
+    print 'rooms: '
     print rooms()
     leave_room(room)
     room_info.append(u.name + ' has left room ' + room)
