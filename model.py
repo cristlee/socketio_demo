@@ -14,6 +14,7 @@ class User(Model):
     device = UnicodeAttribute(hash_key=True)
     id = NumberAttribute()
     name = UnicodeAttribute(null=True)
+    photo_url = UnicodeAttribute(null=True)
     lev = NumberAttribute(default=1)
     xp = NumberAttribute(default=0)
     tickets = NumberAttribute(default=2000)
@@ -26,6 +27,7 @@ class User(Model):
     email = UnicodeAttribute(null=True)
     token = UnicodeAttribute(null=True)
     pk = UnicodeAttribute(null=True)
+    card_data = ListAttribute(null=True)
 
     @classmethod
     def create_by_device(cls, device):
@@ -52,8 +54,8 @@ class Room(Model):
         table_name = 'Room'
         region = 'us-west-2'
 
-    tid = NumberAttribute(hash_key=True)
-    room_num = NumberAttribute(range_key=True)
+    id = NumberAttribute(hash_key=True)
+    tid = NumberAttribute()
     status = BooleanAttribute(default=True)
     runrobot = BooleanAttribute(default=True)
     goingdown = BooleanAttribute(default=True)
@@ -62,6 +64,16 @@ class Room(Model):
     nextseqnumbers = ListAttribute(null=True)
     readcount = NumberAttribute(default=0)
     population = NumberAttribute(default=0)
+    player = NumberAttribute(default=0)
+    card = NumberAttribute(default=0)
+    robot = NumberAttribute(default=0)
+    robotcard = NumberAttribute(default=0)
+    totalbingo = NumberAttribute(default=0)
+    bingoleft = NumberAttribute(default=0)
+    ranklist = ListAttribute(null=True)
+
+    def join(self):
+        self.update(actions=[Room.player.set(Room.player + 1)])
 
 
 class Purchase(Model):
