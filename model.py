@@ -1,7 +1,7 @@
 import datetime
 from pynamodb.models import Model
 from pynamodb.attributes import (
-    UnicodeAttribute, NumberAttribute, UnicodeSetAttribute, UTCDateTimeAttribute, JSONAttribute, ListAttribute
+    UnicodeAttribute, NumberAttribute, UnicodeSetAttribute, UTCDateTimeAttribute, JSONAttribute, ListAttribute, BooleanAttribute
 )
 
 
@@ -23,6 +23,9 @@ class User(Model):
     fid = NumberAttribute(null=True)
     first_login = UTCDateTimeAttribute(null=True)
     last_login = UTCDateTimeAttribute(null=True)
+    email = UnicodeAttribute(null=True)
+    token = UnicodeAttribute(null=True)
+    pk = UnicodeAttribute(null=True)
 
     @classmethod
     def create_by_device(cls, device):
@@ -41,3 +44,37 @@ class User(Model):
     def buy_cards(self, cards):
         self.tickets -= cards * 10
         self.save()
+
+
+class Room(Model):
+
+    class Meta:
+        table_name = 'Room'
+        region = 'us-west-2'
+
+    tid = NumberAttribute(hash_key=True)
+    room_num = NumberAttribute(range_key=True)
+    status = BooleanAttribute(default=True)
+    runrobot = BooleanAttribute(default=True)
+    goingdown = BooleanAttribute(default=True)
+    start_time = UTCDateTimeAttribute(null=True)
+    seqnumbers = ListAttribute(null=True)
+    nextseqnumbers = ListAttribute(null=True)
+    readcount = NumberAttribute(default=0)
+    population = NumberAttribute(default=0)
+
+
+class Purchase(Model):
+
+    class Meta:
+        table_name = 'Purchase'
+        region = 'us-west-2'
+
+    identifier = UnicodeAttribute(hash_key=True)
+    time = UTCDateTimeAttribute(null=True)
+    uid = NumberAttribute(default=0)
+    tickets = NumberAttribute(default=0)
+    powerups = NumberAttribute(default=0)
+    items = UnicodeAttribute(null=True)
+
+# Room.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
